@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Tienda de Mascotas La Chanda</title>
+    <title>La Chanda</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -24,7 +24,7 @@
 
         h1 { 
             color: #4a5568; 
-            font-size: 22px; 
+            font-size: 24px; 
             margin-bottom: 15px; 
             text-align: center;
         }
@@ -183,12 +183,12 @@
             Conectando a Firebase...
         </div>
 
-        <h1>Tienda de Mascotas "La Chanda"</h1>
+        <h1>La Chanda</h1>
 
         <!-- BOTONES DE PESTAÑAS -->
         <div class="contenedor-pestanas">
             <button class="btn-pestana activa" onclick="cambiarPestana('pestanaRegistrar', this)">Registrar Producto</button>
-            <button class="btn-pestana" onclick="cambiarPestana('pestanaMostrar', this)">Inventario (En tiempo real)</button>
+            <button class="btn-pestana" onclick="cambiarPestana('pestanaMostrar', this)">Inventario</button>
         </div>
 
         <!-- PESTAÑA 1: REGISTRAR -->
@@ -223,8 +223,6 @@
 
         <!-- PESTAÑA 2: MOSTRAR Y ELIMINAR -->
         <div id="pestanaMostrar" class="contenido-pestana">
-            <p style="font-size: 13px; color: #718096; text-align: center;">Los cambios hechos en otros equipos se reflejan aquí al instante.</p>
-
             <div id="tablaContenedor"></div>
         </div>
 
@@ -266,7 +264,7 @@
             elemento.classList.add('activa');
         };
 
-        // Registrar producto (Se guarda en Firebase y limpia el formulario)
+        // Registrar producto
         window.registrarProducto = async function() {
             const id = document.getElementById("regId").value.trim();
             const nombre = document.getElementById("regNombre").value.trim();
@@ -298,7 +296,7 @@
             }
         };
 
-        // ESCUCHA EN TIEMPO REAL (Actualización automática para todos los computadores)
+        // Escucha en tiempo real para actualizar la tabla
         const tablaDiv = document.getElementById("tablaContenedor");
 
         onSnapshot(collection(db, "productos"), (querySnapshot) => {
