@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Tienda de Mascotas La Chanda</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 30px 0;
+            color: #333333;
+        }
+
+        .contenedor {
+            width: 550px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e1e8ed;
+        }
+
+        h1 { 
+            color: #4a5568; 
+            font-size: 22px; 
+            margin-bottom: 15px; 
+            text-align: center;
+        }
+
+        .mensaje-conexion {
+            font-size: 13px;
+            color: #2b6cb0;
+            background-color: #ebf8ff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid #bee3f8;
+        }
+
+        /* ESTILOS DE LAS PESTAÑAS (TABS) */
+        .contenedor-pestanas {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 5px;
+        }
+
+        .btn-pestana {
+            padding: 10px 20px;
+            background-color: #edf2f7;
+            color: #4a5568;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-pestana.activa {
+            background-color: #9f7aea;
+            color: white;
+        }
+
+        .btn-pestana:hover:not(.activa) {
+            background-color: #e2e8f0;
+        }
+
+        /* CONTENIDO DE LAS PESTAÑAS */
+        .contenido-pestana {
+            display: none;
+        }
+
+        .contenido-pestana.activo {
+            display: block;
+        }
+
+        /* FORMULARIO Y ESTILOS */
+        label {
+            display: block;
+            margin-top: 12px;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            margin-top: 6px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            box-sizing: border-box;
+            background-color: #f7fafc;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #b794f4;
+            background-color: #ffffff;
+        }
+
+        .contenedor-botones {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        button {
+            padding: 11px 22px;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            background-color: #9f7aea;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        button:hover { 
+            background-color: #805ad5; 
+        }
+
+        .btn-eliminar {
+            background-color: #feb2b2;
+            color: #9b2c2c;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .btn-eliminar:hover {
+            background-color: #fc8181;
+            color: white;
+        }
+
+        .mensaje-alerta {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 15px;
+            text-align: center;
+            color: #38a169;
+        }
+
+        /* TABLA DE PRODUCTOS */
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #e9d8fd;
+            color: #4a5568;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f7fafc;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="contenedor">
+        <div class="mensaje-conexion" id="mensajeConexion">
+            Conectando a Firebase...
+        </div>
+
+        <h1>Tienda de Mascotas "La Chanda"</h1>
+
+        <!-- BOTONES DE PESTAÑAS -->
+        <div class="contenedor-pestanas">
+            <button class="btn-pestana activa" onclick="cambiarPestana('pestanaRegistrar', this)">Registrar Producto</button>
+            <button class="btn-pestana" onclick="cambiarPestana('pestanaMostrar', this)">Inventario (En tiempo real)</button>
+        </div>
+
+        <!-- PESTAÑA 1: REGISTRAR -->
+        <div id="pestanaRegistrar" class="contenido-pestana activo">
+            <form id="formularioRegistro" onsubmit="event.preventDefault();">
+                <label>ID del Producto:</label>
+                <input type="text" id="regId" placeholder="Ej: P01">
+
+                <label>Nombre del Producto:</label>
+                <input type="text" id="regNombre" placeholder="Ej: Croquetas Cachorro">
+
+                <label>Tipo de Mascota:</label>
+                <select id="regTipo">
+                    <option value="">Seleccione una opción</option>
+                    <option value="Perro">Perro</option>
+                    <option value="Gato">Gato</option>
+                </select>
+
+                <label>Valor ($):</label>
+                <input type="number" id="regValor" placeholder="Ej: 25000">
+
+                <label>Cantidad:</label>
+                <input type="number" id="regCantidad" placeholder="Ej: 10">
+
+                <div class="contenedor-botones">
+                    <button type="button" onclick="registrarProducto()">Registrar Producto</button>
+                </div>
+            </form>
+
+            <div id="mensajeRegistro" class="mensaje-alerta"></div>
+        </div>
+
+        <!-- PESTAÑA 2: MOSTRAR Y ELIMINAR -->
+        <div id="pestanaMostrar" class="contenido-pestana">
+            <p style="font-size: 13px; color: #718096; text-align: center;">Los cambios hechos en otros equipos se reflejan aquí al instante.</p>
+
+            <div id="tablaContenedor"></div>
+        </div>
+
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc, 
+            deleteDoc, 
+            collection,
+            onSnapshot 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Reemplaza estas credenciales con las de tu consola de Firebase
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROJECT_ID.firebaseapp.com",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_PROJECT_ID.appspot.com",
+            messagingSenderId: "TU_MESSAGING_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        document.getElementById("mensajeConexion").innerText = "Conexión exitosa a la base de datos :D";
+
+        // Cambiar de pestaña
+        window.cambiarPestana = function(pestanaId, elemento) {
+            document.querySelectorAll('.contenido-pestana').forEach(div => div.classList.remove('activo'));
+            document.querySelectorAll('.btn-pestana').forEach(btn => btn.classList.remove('activa'));
+
+            document.getElementById(pestanaId).classList.add('activo');
+            elemento.classList.add('activa');
+        };
+
+        // Registrar producto (Se guarda en Firebase y limpia el formulario)
+        window.registrarProducto = async function() {
+            const id = document.getElementById("regId").value.trim();
+            const nombre = document.getElementById("regNombre").value.trim();
+            const tipo = document.getElementById("regTipo").value;
+            const valor = document.getElementById("regValor").value;
+            const cantidad = document.getElementById("regCantidad").value;
+            const msgDiv = document.getElementById("mensajeRegistro");
+
+            if (id && nombre && tipo && valor && cantidad) {
+                try {
+                    await setDoc(doc(db, "productos", id), {
+                        nombre: nombre,
+                        tipo: tipo,
+                        valor: Number(valor),
+                        cantidad: Number(cantidad)
+                    });
+                    
+                    msgDiv.style.color = "#38a169";
+                    msgDiv.innerHTML = "¡Producto registrado correctamente!";
+                    document.getElementById("formularioRegistro").reset();
+
+                } catch (e) {
+                    msgDiv.style.color = "#e53e3e";
+                    msgDiv.innerHTML = "Error al guardar: " + e.message;
+                }
+            } else {
+                msgDiv.style.color = "#dd6b20";
+                msgDiv.innerHTML = "Por favor complete todos los campos.";
+            }
+        };
+
+        // ESCUCHA EN TIEMPO REAL (Actualización automática para todos los computadores)
+        const tablaDiv = document.getElementById("tablaContenedor");
+
+        onSnapshot(collection(db, "productos"), (querySnapshot) => {
+            if (!querySnapshot.empty) {
+                let html = "<table>";
+                html += "<tr><th>ID</th><th>Producto</th><th>Tipo</th><th>Valor ($)</th><th>Cant.</th><th>Acción</th></tr>";
+
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const id = docSnap.id;
+                    html += `<tr>
+                        <td>${id}</td>
+                        <td>${data.nombre || ''}</td>
+                        <td>${data.tipo || ''}</td>
+                        <td>$${data.valor || 0}</td>
+                        <td>${data.cantidad || 0}</td>
+                        <td>
+                            <button class="btn-eliminar" onclick="eliminarFila('${id}')">Eliminar</button>
+                        </td>
+                    </tr>`;
+                });
+
+                html += "</table>";
+                tablaDiv.innerHTML = html;
+            } else {
+                tablaDiv.innerHTML = "<p style='text-align: center; color: #718096;'>No hay productos registrados en el inventario.</p>";
+            }
+        });
+
+        // Eliminar producto
+        window.eliminarFila = async function(id) {
+            if (confirm(`¿Deseas eliminar el producto con ID "${id}"?`)) {
+                try {
+                    await deleteDoc(doc(db, "productos", id));
+                } catch (e) {
+                    alert("Error al eliminar: " + e.message);
+                }
+            }
+        };
+    </script>
+</body>
+</html>
