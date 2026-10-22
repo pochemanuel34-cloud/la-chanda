@@ -1,343 +1,164 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>La Chanda</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            margin: 0;
-            padding: 30px 0;
-            color: #333333;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Chanda</title>
+<style>
+    :root { --morado: #9f7aea; --morado-osc: #805ad5; --borde: #e2e8f0; --texto: #4a5568; }
+    body { font-family: 'Segoe UI', Tahoma, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 30px 12px; color: #333; }
+    .contenedor { max-width: 550px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; border: 1px solid #e1e8ed; box-shadow: 0 4px 15px rgba(0,0,0,.05); }
+    h1 { color: var(--texto); font-size: 24px; text-align: center; margin: 0 0 15px; }
+    #estado { font-size: 13px; color: #2b6cb0; background: #ebf8ff; border: 1px solid #bee3f8; padding: 8px 12px; border-radius: 6px; text-align: center; margin-bottom: 20px; }
+    #estado.error { color: #9b2c2c; background: #fff5f5; border-color: #feb2b2; }
 
-        .contenedor {
-            width: 550px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e1e8ed;
-        }
+    .pestanas { display: flex; justify-content: center; gap: 8px; margin-bottom: 25px; padding-bottom: 5px; border-bottom: 2px solid #edf2f7; }
+    .pestana { background: #edf2f7; color: var(--texto); }
+    .pestana:hover:not(.activa) { background: var(--borde); }
+    .pestana.activa { background: var(--morado); color: #fff; }
+    .panel { display: none; }
+    .panel.activo { display: block; }
 
-        h1 { 
-            color: #4a5568; 
-            font-size: 24px; 
-            margin-bottom: 15px; 
-            text-align: center;
-        }
+    label { display: block; margin-top: 12px; color: var(--texto); font-weight: 600; font-size: 14px; }
+    input, select { width: 100%; padding: 10px 12px; margin-top: 6px; border: 1px solid #cbd5e0; border-radius: 6px; box-sizing: border-box; background: #f7fafc; font-size: 14px; outline: none; }
+    input:focus, select:focus { border-color: #b794f4; background: #fff; }
 
-        .mensaje-conexion {
-            font-size: 13px;
-            color: #2b6cb0;
-            background-color: #ebf8ff;
-            padding: 8px 12px;
-            border-radius: 6px;
-            text-align: center;
-            margin-bottom: 20px;
-            border: 1px solid #bee3f8;
-        }
+    button { padding: 11px 22px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; color: #fff; background: var(--morado); transition: background .2s; }
+    button:hover { background: var(--morado-osc); }
+    .pestana { padding: 10px 20px; border-radius: 8px; }
+    .acciones { margin-top: 25px; text-align: center; }
+    .eliminar { background: #feb2b2; color: #9b2c2c; padding: 6px 12px; font-size: 12px; border-radius: 4px; }
+    .eliminar:hover { background: #fc8181; color: #fff; }
 
-        /* ESTILOS DE LAS PESTAÑAS (TABS) */
-        .contenedor-pestanas {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #edf2f7;
-            padding-bottom: 5px;
-        }
+    #mensaje { font-size: 14px; font-weight: 600; margin-top: 15px; text-align: center; }
+    .ok { color: #38a169; } .err { color: #e53e3e; } .aviso { color: #dd6b20; }
 
-        .btn-pestana {
-            padding: 10px 20px;
-            background-color: #edf2f7;
-            color: #4a5568;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-pestana.activa {
-            background-color: #9f7aea;
-            color: white;
-        }
-
-        .btn-pestana:hover:not(.activa) {
-            background-color: #e2e8f0;
-        }
-
-        /* CONTENIDO DE LAS PESTAÑAS */
-        .contenido-pestana {
-            display: none;
-        }
-
-        .contenido-pestana.activo {
-            display: block;
-        }
-
-        /* FORMULARIO Y ESTILOS */
-        label {
-            display: block;
-            margin-top: 12px;
-            color: #4a5568;
-            font-weight: 600;
-            font-size: 14px;
-            text-align: left;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 10px 12px;
-            margin-top: 6px;
-            border: 1px solid #cbd5e0;
-            border-radius: 6px;
-            box-sizing: border-box;
-            background-color: #f7fafc;
-            font-size: 14px;
-            outline: none;
-        }
-
-        input:focus, select:focus {
-            border-color: #b794f4;
-            background-color: #ffffff;
-        }
-
-        .contenedor-botones {
-            margin-top: 25px;
-            text-align: center;
-        }
-
-        button {
-            padding: 11px 22px;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 14px;
-            background-color: #9f7aea;
-            font-weight: 600;
-            transition: background-color 0.2s;
-        }
-
-        button:hover { 
-            background-color: #805ad5; 
-        }
-
-        .btn-eliminar {
-            background-color: #feb2b2;
-            color: #9b2c2c;
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 4px;
-        }
-
-        .btn-eliminar:hover {
-            background-color: #fc8181;
-            color: white;
-        }
-
-        .mensaje-alerta {
-            font-size: 14px;
-            font-weight: 600;
-            margin-top: 15px;
-            text-align: center;
-            color: #38a169;
-        }
-
-        /* TABLA DE PRODUCTOS */
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        th, td {
-            padding: 10px;
-            text-align: center;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 14px;
-        }
-
-        th {
-            background-color: #e9d8fd;
-            color: #4a5568;
-            font-weight: 600;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f7fafc;
-        }
-    </style>
+    .tabla-wrap { overflow-x: auto; }
+    table { width: 100%; margin-top: 20px; border-collapse: collapse; }
+    th, td { padding: 10px; text-align: center; border-bottom: 1px solid var(--borde); font-size: 14px; }
+    th { background: #e9d8fd; color: var(--texto); }
+    tr:nth-child(even) { background: #f7fafc; }
+    .vacio { text-align: center; color: #718096; }
+</style>
 </head>
 <body>
+<div class="contenedor">
+    <div id="estado">Conectando a Firebase...</div>
+    <h1>La Chanda</h1>
 
-    <div class="contenedor">
-        <div class="mensaje-conexion" id="mensajeConexion">
-            Conectando a Firebase...
-        </div>
-
-        <h1>La Chanda</h1>
-
-        <!-- BOTONES DE PESTAÑAS -->
-        <div class="contenedor-pestanas">
-            <button class="btn-pestana activa" onclick="cambiarPestana('pestanaRegistrar', this)">Registrar Producto</button>
-            <button class="btn-pestana" onclick="cambiarPestana('pestanaMostrar', this)">Inventario</button>
-        </div>
-
-        <!-- PESTAÑA 1: REGISTRAR -->
-        <div id="pestanaRegistrar" class="contenido-pestana activo">
-            <form id="formularioRegistro" onsubmit="event.preventDefault();">
-                <label>ID del Producto:</label>
-                <input type="text" id="regId" placeholder="Ej: P01">
-
-                <label>Nombre del Producto:</label>
-                <input type="text" id="regNombre" placeholder="Ej: Croquetas Cachorro">
-
-                <label>Tipo de Mascota:</label>
-                <select id="regTipo">
-                    <option value="">Seleccione una opción</option>
-                    <option value="Perro">Perro</option>
-                    <option value="Gato">Gato</option>
-                </select>
-
-                <label>Valor ($):</label>
-                <input type="number" id="regValor" placeholder="Ej: 25000">
-
-                <label>Cantidad:</label>
-                <input type="number" id="regCantidad" placeholder="Ej: 10">
-
-                <div class="contenedor-botones">
-                    <button type="button" onclick="registrarProducto()">Registrar Producto</button>
-                </div>
-            </form>
-
-            <div id="mensajeRegistro" class="mensaje-alerta"></div>
-        </div>
-
-        <!-- PESTAÑA 2: MOSTRAR Y ELIMINAR -->
-        <div id="pestanaMostrar" class="contenido-pestana">
-            <div id="tablaContenedor"></div>
-        </div>
-
+    <div class="pestanas">
+        <button class="pestana activa" data-panel="registrar">Registrar Producto</button>
+        <button class="pestana" data-panel="inventario">Inventario</button>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { 
-            getFirestore, 
-            doc, 
-            setDoc, 
-            deleteDoc, 
-            collection,
-            onSnapshot 
-        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <div id="registrar" class="panel activo">
+        <form id="formulario">
+            <label>ID del Producto:
+                <input id="id" placeholder="Ej: P01" required>
+            </label>
+            <label>Nombre del Producto:
+                <input id="nombre" placeholder="Ej: Croquetas Cachorro" required>
+            </label>
+            <label>Tipo de Mascota:
+                <select id="tipo" required>
+                    <option value="">Seleccione una opción</option>
+                    <option>Perro</option>
+                    <option>Gato</option>
+                </select>
+            </label>
+            <label>Valor ($):
+                <input type="number" id="valor" min="0" placeholder="Ej: 25000" required>
+            </label>
+            <label>Cantidad:
+                <input type="number" id="cantidad" min="0" placeholder="Ej: 10" required>
+            </label>
+            <div class="acciones"><button type="submit">Registrar Producto</button></div>
+        </form>
+        <div id="mensaje"></div>
+    </div>
 
-        // Configuración oficial de tu proyecto Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBiPzvMzlSYdMimNKL5uu-BVxIVcqxhvSk",
-            authDomain: "la-chanda-8def6.firebaseapp.com",
-            databaseURL: "https://la-chanda-8def6-default-rtdb.firebaseio.com",
-            projectId: "la-chanda-8def6",
-            storageBucket: "la-chanda-8def6.firebasestorage.app",
-            messagingSenderId: "388693846062",
-            appId: "1:388693846062:web:07b91f696f5285b88357bf",
-            measurementId: "G-DLBTP69CXK"
-        };
+    <div id="inventario" class="panel"></div>
+</div>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, deleteDoc, collection, onSnapshot }
+        from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        document.getElementById("mensajeConexion").innerText = "Conexión exitosa a la base de datos :D";
+    const db = getFirestore(initializeApp({
+        apiKey: "AIzaSyBiPzvMzlSYdMimNKL5uu-BVxIVcqxhvSk",
+        authDomain: "la-chanda-8def6.firebaseapp.com",
+        projectId: "la-chanda-8def6",
+        appId: "1:388693846062:web:07b91f696f5285b88357bf"
+    }));
 
-        // Cambiar de pestaña
-        window.cambiarPestana = function(pestanaId, elemento) {
-            document.querySelectorAll('.contenido-pestana').forEach(div => div.classList.remove('activo'));
-            document.querySelectorAll('.btn-pestana').forEach(btn => btn.classList.remove('activa'));
+    const $ = id => document.getElementById(id);
+    const estado = $("estado"), mensaje = $("mensaje"), inventario = $("inventario");
 
-            document.getElementById(pestanaId).classList.add('activo');
-            elemento.classList.add('activa');
-        };
+    // Evita inyección de HTML con los datos de la base
+    const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
-        // Registrar producto
-        window.registrarProducto = async function() {
-            const id = document.getElementById("regId").value.trim();
-            const nombre = document.getElementById("regNombre").value.trim();
-            const tipo = document.getElementById("regTipo").value;
-            const valor = document.getElementById("regValor").value;
-            const cantidad = document.getElementById("regCantidad").value;
-            const msgDiv = document.getElementById("mensajeRegistro");
+    const mostrar = (texto, clase) => { mensaje.className = clase; mensaje.textContent = texto; };
 
-            if (id && nombre && tipo && valor && cantidad) {
-                try {
-                    await setDoc(doc(db, "productos", id), {
-                        nombre: nombre,
-                        tipo: tipo,
-                        valor: Number(valor),
-                        cantidad: Number(cantidad)
-                    });
-                    
-                    msgDiv.style.color = "#38a169";
-                    msgDiv.innerHTML = "¡Producto registrado correctamente!";
-                    document.getElementById("formularioRegistro").reset();
+    // Pestañas
+    document.querySelector(".pestanas").addEventListener("click", e => {
+        const btn = e.target.closest(".pestana");
+        if (!btn) return;
+        document.querySelectorAll(".pestana").forEach(b => b.classList.toggle("activa", b === btn));
+        document.querySelectorAll(".panel").forEach(p => p.classList.toggle("activo", p.id === btn.dataset.panel));
+    });
 
-                } catch (e) {
-                    msgDiv.style.color = "#e53e3e";
-                    msgDiv.innerHTML = "Error al guardar: " + e.message;
-                }
-            } else {
-                msgDiv.style.color = "#dd6b20";
-                msgDiv.innerHTML = "Por favor complete todos los campos.";
-            }
-        };
+    // Registrar producto
+    $("formulario").addEventListener("submit", async e => {
+        e.preventDefault();
+        const id = $("id").value.trim();
+        if (id.includes("/")) return mostrar("El ID no puede contener «/».", "aviso");
+        try {
+            await setDoc(doc(db, "productos", id), {
+                nombre: $("nombre").value.trim(),
+                tipo: $("tipo").value,
+                valor: Number($("valor").value),
+                cantidad: Number($("cantidad").value)
+            });
+            mostrar("¡Producto registrado correctamente!", "ok");
+            e.target.reset();
+        } catch (err) {
+            mostrar("Error al guardar: " + err.message, "err");
+        }
+    });
 
-        // Escucha en tiempo real
-        const tablaDiv = document.getElementById("tablaContenedor");
+    // Inventario en tiempo real
+    onSnapshot(collection(db, "productos"), snap => {
+        estado.className = "";
+        estado.textContent = "Conexión exitosa a la base de datos :D";
 
-        onSnapshot(collection(db, "productos"), (querySnapshot) => {
-            if (!querySnapshot.empty) {
-                let html = "<table>";
-                html += "<tr><th>ID</th><th>Producto</th><th>Tipo</th><th>Valor ($)</th><th>Cant.</th><th>Acción</th></tr>";
+        if (snap.empty) {
+            inventario.innerHTML = '<p class="vacio">No hay productos registrados en el inventario.</p>';
+            return;
+        }
+        const filas = snap.docs.map(d => {
+            const p = d.data();
+            return `<tr>
+                <td>${esc(d.id)}</td><td>${esc(p.nombre)}</td><td>${esc(p.tipo)}</td>
+                <td>$${esc(p.valor || 0)}</td><td>${esc(p.cantidad || 0)}</td>
+                <td><button class="eliminar" data-id="${esc(d.id)}">Eliminar</button></td>
+            </tr>`;
+        }).join("");
+        inventario.innerHTML = `<div class="tabla-wrap"><table>
+            <tr><th>ID</th><th>Producto</th><th>Tipo</th><th>Valor ($)</th><th>Cant.</th><th>Acción</th></tr>${filas}
+        </table></div>`;
+    }, err => {
+        estado.className = "error";
+        estado.textContent = "Error de conexión: " + err.message;
+    });
 
-                querySnapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    const id = docSnap.id;
-                    html += `<tr>
-                        <td>${id}</td>
-                        <td>${data.nombre || ''}</td>
-                        <td>${data.tipo || ''}</td>
-                        <td>$${data.valor || 0}</td>
-                        <td>${data.cantidad || 0}</td>
-                        <td>
-                            <button class="btn-eliminar" onclick="eliminarFila('${id}')">Eliminar</button>
-                        </td>
-                    </tr>`;
-                });
-
-                html += "</table>";
-                tablaDiv.innerHTML = html;
-            } else {
-                tablaDiv.innerHTML = "<p style='text-align: center; color: #718096;'>No hay productos registrados en el inventario.</p>";
-            }
-        });
-
-        // Eliminar producto
-        window.eliminarFila = async function(id) {
-            if (confirm(`¿Deseas eliminar el producto con ID "${id}"?`)) {
-                try {
-                    await deleteDoc(doc(db, "productos", id));
-                } catch (e) {
-                    alert("Error al eliminar: " + e.message);
-                }
-            }
-        };
-    </script>
+    // Eliminar producto 
+    inventario.addEventListener("click", async e => {
+        const id = e.target.dataset.id;
+        if (!id || !confirm(`¿Deseas eliminar el producto con ID "${id}"?`)) return;
+        try { await deleteDoc(doc(db, "productos", id)); }
+        catch (err) { alert("Error al eliminar: " + err.message); }
+    });
+</script>
 </body>
 </html>
